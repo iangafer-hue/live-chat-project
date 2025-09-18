@@ -1,19 +1,61 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Live Chat</title>
-  <link rel="stylesheet" href="style.css" />
+  <style>
+    body { font-family: Arial; display: flex; justify-content: center; align-items: center; height: 100vh; background: #f0f0f0; margin: 0; }
+    #chat-container { width: 100%; max-width: 600px; background: white; border-radius: 10px; padding: 20px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+    #messages { height: 300px; overflow-y: auto; border-bottom: 1px solid #ddd; margin-bottom: 10px; padding-bottom: 10px; }
+    #messageInput { width: calc(100% - 100px); padding: 10px; margin-right: 10px; border-radius: 5px; border: 1px solid #ddd; }
+    #sendBtn { padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
+  </style>
 </head>
 <body>
-  <div id="chat-container">
-    <div id="messages"></div>
-    <input type="text" id="messageInput" placeholder="Type a message..." />
-    <button id="sendBtn">Send</button>
-  </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.5.0/dist/supabase.min.js"></script>
-  <script src="script.js"></script>
+<div id="chat-container">
+  <div id="messages"></div>
+  <input type="text" id="messageInput" placeholder="Type a message..." />
+  <button id="sendBtn">Send</button>
+</div>
+
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+
+const supabaseUrl = 'https://vobuxnfqelwjhebkjrwt.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZvYnV4bmZxZWx3amhlYmtqcnd0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgxNTcxOTYsImV4cCI6MjA3MzczMzE5Nn0.z5jijKIbhOnIHnJFpg1EzhA_RCqVEQWxpLwmWjz1FQ8';
+const supabase = createClient(supabaseUrl, supabaseKey);
+
+const messagesDiv = document.getElementById('messages');
+const input = document.getElementById('messageInput');
+const sendBtn = document.getElementById('sendBtn');
+
+function addMessage(username, message) {
+  const div = document.createElement('div');
+  div.textContent = `${username}: ${message}`;
+  messagesDiv.appendChild(div);
+  messagesDiv.scrollTop = messagesDiv.scrollHeight;
+}
+
+async function loadMessages() {
+  const { data: messages } = await supabase.from('messages').select('*').order('created_at', { ascending: true });
+  if (messages) messages.forEach(msg => addMessage(msg.username, msg.message));
+}
+
+sendBtn.onclick = async () => {
+  const msg = input.value.trim();
+  if (!msg) return;
+  const { error } = await supabase.from('messages').insert([{ username: 'User', message: msg }]);
+  if (!error) input.value = '';
+}
+
+supabase.from('messages').on('INSERT', payload => {
+  addMessage(payload.new.username, payload.new.message);
+}).subscribe();
+
+loadMessages();
+</script>
+
 </body>
 </html>
