@@ -1,5 +1,5 @@
-const supabaseUrl = 'YOUR_SUPABASE_URL';
-const supabaseKey = 'YOUR_SUPABASE_KEY';
+const supabaseUrl = https://vobuxnfqelwjhebkjrwt.supabase.co;
+const supabaseKey = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZvYnV4bmZxZWx3amhlYmtqcnd0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgxNTcxOTYsImV4cCI6MjA3MzczMzE5Nn0.z5jijKIbhOnIHnJFpg1EzhA_RCqVEQWxpLwmWjz1FQ8;
 const supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
 const messagesDiv = document.getElementById('messages');
