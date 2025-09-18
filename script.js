@@ -1,5 +1,6 @@
-const supabaseUrl = https://vobuxnfqelwjhebkjrwt.supabase.co;
-const supabaseKey = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZvYnV4bmZxZWx3amhlYmtqcnd0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgxNTcxOTYsImV4cCI6MjA3MzczMzE5Nn0.z5jijKIbhOnIHnJFpg1EzhA_RCqVEQWxpLwmWjz1FQ8;
+const supabaseUrl = 'https://vobuxnfqelwjhebkjrwt.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZvYnV4bmZxZWx3amhlYmtqcnd0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgxNTcxOTYsImV4cCI6MjA3MzczMzE5Nn0.z5jijKIbhOnIHnJFpg1EzhA_RCqVEQWxpLwmWjz1FQ8';
+
 const supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
 const messagesDiv = document.getElementById('messages');
@@ -12,6 +13,7 @@ async function loadMessages() {
     .select('*')
     .order('created_at', { ascending: true });
   if (messages) messages.forEach(msg => addMessage(msg.username, msg.message));
+  if (error) console.error(error);
 }
 
 function addMessage(username, message) {
@@ -24,8 +26,9 @@ function addMessage(username, message) {
 sendBtn.onclick = async () => {
   const msg = input.value.trim();
   if (!msg) return;
-  await supabase.from('messages').insert([{ username: 'User', message: msg }]);
-  input.value = '';
+  const { error } = await supabase.from('messages').insert([{ username: 'User', message: msg }]);
+  if (!error) input.value = '';
+  else console.error(error);
 };
 
 supabase.from('messages').on('INSERT', payload => {
